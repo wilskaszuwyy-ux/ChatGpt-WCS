@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculadora de capacidad portante (Terzaghi)</title>
+    <style>
+      :root {
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      }
+
+      body {
+        margin: 0;
+        padding: 1.25rem;
+        background: #f3f5fb;
+        color: #162136;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1rem 1.1rem;
+        margin: 1rem 0;
+        box-shadow: 0 3px 14px rgba(0, 0, 0, 0.09);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 0.8rem;
+      }
+
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        font-weight: 600;
+      }
+
+      input,
+      select,
+      button {
+        font: inherit;
+        padding: 0.5rem;
+        border-radius: 8px;
+        border: 1px solid #b7bfd5;
+      }
+
+      button {
+        margin-top: 1rem;
+        border: none;
+        cursor: pointer;
+        background: #2e52ff;
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .results li {
+        margin: 0.35rem 0;
+      }
+
+      .hint {
+        font-size: 0.93rem;
+        color: #3b4868;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <h1>Calculadora de capacidad portante (Terzaghi)</h1>
+      <p>Todo está en este único archivo <strong>HTML</strong>. Solo abre este archivo en tu navegador y podrás verlo/calcular.</p>
+
+      <section class="card">
+        <form id="terzaghi-form">
+          <div class="grid">
+            <label>
+              Tipo de zapata
+              <select id="footingType">
+                <option value="strip">Corrida</option>
+                <option value="square">Cuadrada</option>
+                <option value="circular">Circular</option>
+              </select>
+            </label>
+
+            <label>
+              Cohesión c (kPa)
+              <input id="cohesion" type="number" min="0" step="0.01" value="20" required />
+            </label>
+
+            <label>
+              Ángulo de fricción φ (°)
+              <input id="phi" type="number" min="0" max="60" step="0.01" value="28" required />
+            </label>
+
+            <label>
+              Peso unitario γ (kN/m³)
+              <input id="gamma" type="number" min="0" step="0.01" value="18" required />
+            </label>
+
+            <label>
+              Ancho B (m)
+              <input id="width" type="number" min="0.01" step="0.01" value="1.5" required />
+            </label>
+
+            <label>
+              Profundidad de desplante Df (m)
+              <input id="depth" type="number" min="0" step="0.01" value="1.2" required />
+            </label>
+
+            <label>
+              Factor de seguridad FS
+              <input id="safety" type="number" min="1" step="0.01" value="3" required />
+            </label>
+          </div>
+
+          <button type="submit">Calcular</button>
+        </form>
+      </section>
+
+      <section class="card results" aria-live="polite">
+        <h2>Resultados</h2>
+        <ul>
+          <li><strong>Nc:</strong> <span id="Nc">-</span></li>
+          <li><strong>Nq:</strong> <span id="Nq">-</span></li>
+          <li><strong>Nγ:</strong> <span id="Ngamma">-</span></li>
+          <li><strong>q = γ·Df:</strong> <span id="q">-</span> kPa</li>
+          <li><strong>qult:</strong> <span id="qult">-</span> kPa</li>
+          <li><strong>qadm = qult / FS:</strong> <span id="qadm">-</span> kPa</li>
+        </ul>
+      </section>
+
+      <section class="card hint">
+        <p>
+          Fórmulas: Nq = e^(π tanφ)·tan²(45+φ/2), Nc = (Nq - 1)cotφ (5.7 si φ=0), Nγ = 1.5(Nq - 1)tanφ.
+          Terzaghi: corrida = cNc + qNq + 0.5γBNγ, cuadrada = 1.3cNc + qNq + 0.4γBNγ, circular = 1.3cNc + qNq + 0.3γBNγ.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      const form = document.getElementById('terzaghi-form');
+
+      const outputs = {
+        Nc: document.getElementById('Nc'),
+        Nq: document.getElementById('Nq'),
+        Ngamma: document.getElementById('Ngamma'),
+        q: document.getElementById('q'),
+        qult: document.getElementById('qult'),
+        qadm: document.getElementById('qadm')
+      };
+
+      function degToRad(v) {
+        return (v * Math.PI) / 180;
+      }
+
+      function factors(phiDeg) {
+        const phi = degToRad(phiDeg);
+        const tanPhi = Math.tan(phi);
+        const Nq = Math.exp(Math.PI * tanPhi) * Math.tan(degToRad(45) + phi / 2) ** 2;
+        const Nc = phiDeg === 0 ? 5.7 : (Nq - 1) / tanPhi;
+        const Ngamma = 1.5 * (Nq - 1) * tanPhi;
+        return { Nc, Nq, Ngamma };
+      }
+
+      function qultByType(type, c, q, gamma, B, f) {
+        if (type === 'square') return 1.3 * c * f.Nc + q * f.Nq + 0.4 * gamma * B * f.Ngamma;
+        if (type === 'circular') return 1.3 * c * f.Nc + q * f.Nq + 0.3 * gamma * B * f.Ngamma;
+        return c * f.Nc + q * f.Nq + 0.5 * gamma * B * f.Ngamma;
+      }
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const type = document.getElementById('footingType').value;
+        const c = Number(document.getElementById('cohesion').value);
+        const phi = Number(document.getElementById('phi').value);
+        const gamma = Number(document.getElementById('gamma').value);
+        const B = Number(document.getElementById('width').value);
+        const Df = Number(document.getElementById('depth').value);
+        const FS = Number(document.getElementById('safety').value);
+
+        const f = factors(phi);
+        const q = gamma * Df;
+        const qult = qultByType(type, c, q, gamma, B, f);
+        const qadm = qult / FS;
+
+        outputs.Nc.textContent = f.Nc.toFixed(3);
+        outputs.Nq.textContent = f.Nq.toFixed(3);
+        outputs.Ngamma.textContent = f.Ngamma.toFixed(3);
+        outputs.q.textContent = q.toFixed(2);
+        outputs.qult.textContent = qult.toFixed(2);
+        outputs.qadm.textContent = qadm.toFixed(2);
+      });
+
+      form.requestSubmit();
+    </script>
+  </body>
+</html>
