@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 globalThis.window = globalThis;
 
@@ -44,3 +45,31 @@ test("el formateo monetario conserva importes de valorizacion en soles", () => {
   assert.equal(formatCurrency(58320), "S/ 58,320.00");
   assert.equal(formatCurrency(25158.52), "S/ 25,158.52");
 });
+
+test("el presupuesto analitico modificado no se rotula como PIM 2026", () => {
+  const totals = reportData.analyticalBudget.reduce(
+    (sum, row) => ({
+      modifiedBudget: sum.modifiedBudget + row.modifiedBudget,
+      accumulatedExecuted: sum.accumulatedExecuted + row.accumulatedExecuted,
+    }),
+    { modifiedBudget: 0, accumulatedExecuted: 0 },
+  );
+
+  assert.equal(roundTwo(totals.modifiedBudget), reportData.financial.totalModifiedBudget);
+  assert.equal(roundTwo(totals.accumulatedExecuted), 75770);
+  assert.equal(reportData.financial.pim2026, 590798);
+});
+
+test("el PDF embebido es un documento offline valido", () => {
+  const source = readFileSync(new URL("../src/pdfData.js", import.meta.url), "utf8");
+  const match = source.match(/^globalThis\.informePdfBase64 = "([A-Za-z0-9+/=]+)";\n?$/);
+
+  assert.ok(match, "pdfData.js debe declarar el PDF como dato local");
+  const pdf = Buffer.from(match[1], "base64");
+  assert.equal(pdf.subarray(0, 5).toString("ascii"), "%PDF-");
+  assert.match(pdf.subarray(-1024).toString("latin1"), /%%EOF/);
+});
+
+function roundTwo(value) {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}

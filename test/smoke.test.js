@@ -7,6 +7,18 @@ test("la pagina principal carga los recursos offline del dashboard", () => {
 
   assert.match(html, /id="app"/);
   assert.match(html, /src="src\/app.js"/);
+  assert.match(html, /src="src\/reportData.js"/);
+  assert.match(html, /src="src\/dashboardLogic.js"/);
   assert.match(html, /href="src\/styles.css"/);
+  assert.doesNotMatch(html, /type="module"/i);
   assert.doesNotMatch(html, /https?:\/\//i);
+});
+
+test("los recursos principales no declaran dependencias externas", () => {
+  const resources = ["../index.html", "../src/styles.css", "../src/app.js", "../src/reportData.js", "../src/dashboardLogic.js"];
+
+  for (const resource of resources) {
+    const content = readFileSync(new URL(resource, import.meta.url), "utf8");
+    assert.doesNotMatch(content, /https?:\/\//i, `${resource} no debe usar URLs externas`);
+  }
 });

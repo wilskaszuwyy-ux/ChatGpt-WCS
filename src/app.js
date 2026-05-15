@@ -402,18 +402,19 @@ function renderPresupuesto() {
         </article>
       </div>
       <article class="card">
-        <h2>Presupuesto analitico modificado y ejecutado a abril</h2>
+        <h2>Presupuesto analitico modificado y ejecucion acumulada</h2>
+        <p>Esta tabla consolida el presupuesto analitico modificado total del proyecto y su ejecucion acumulada al cierre de abril; el control especifico del PIM 2026 se muestra en las tarjetas superiores.</p>
         ${table(
-          ["Especifica", "Descripcion", "PIM 2026", "Ejecutado", "Saldo", "% ejec."],
+          ["Especifica", "Descripcion", "Presupuesto modificado", "Ejecutado acumulado", "Saldo acumulado", "% ejec. acumulada"],
           reportData.analyticalBudget,
           (row) => `
             <tr>
               <td>${escapeHtml(row.code)}</td>
               <td>${escapeHtml(row.description)}</td>
-              <td>${formatCurrency(row.pim2026)}</td>
-              <td>${formatCurrency(row.executedToApril)}</td>
-              <td>${formatCurrency(row.balance2026)}</td>
-              <td>${formatPercent(calculateExecutionRatio(row.executedToApril, row.pim2026))}</td>
+              <td>${formatCurrency(row.modifiedBudget)}</td>
+              <td>${formatCurrency(row.accumulatedExecuted)}</td>
+              <td>${formatCurrency(row.accumulatedBalance)}</td>
+              <td>${formatPercent(calculateExecutionRatio(row.accumulatedExecuted, row.modifiedBudget))}</td>
             </tr>
           `,
         )}
@@ -580,11 +581,17 @@ function wireEvents() {
     loadPdf.addEventListener("click", async () => {
       loadPdf.disabled = true;
       loadPdf.textContent = "Cargando PDF...";
-      const informePdfBase64 = await loadPdfData();
-      const dataUrl = `data:application/pdf;base64,${informePdfBase64}`;
-      app.querySelector("#pdfFrame").src = dataUrl;
-      app.querySelector("#downloadPdf").href = dataUrl;
-      loadPdf.textContent = "PDF cargado";
+      try {
+        const informePdfBase64 = await loadPdfData();
+        const dataUrl = `data:application/pdf;base64,${informePdfBase64}`;
+        app.querySelector("#pdfFrame").src = dataUrl;
+        app.querySelector("#downloadPdf").href = dataUrl;
+        loadPdf.textContent = "PDF cargado";
+      } catch (error) {
+        loadPdf.disabled = false;
+        loadPdf.textContent = "Reintentar carga PDF";
+        app.querySelector(".pdf-shell").innerHTML = `<p class="pdf-error">${escapeHtml(error.message)}</p>`;
+      }
     });
   }
 }
