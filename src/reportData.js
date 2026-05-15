@@ -1,4 +1,4 @@
-export const reportData = {
+globalThis.reportData = {
   meta: {
     title: "Informe mensual de supervision y valorizacion",
     reportNumber: "Informe mensual N. 01",

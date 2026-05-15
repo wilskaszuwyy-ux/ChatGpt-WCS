@@ -1,14 +1,19 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { reportData } from "../src/reportData.js";
-import {
+globalThis.window = globalThis;
+
+await import("../src/reportData.js");
+await import("../src/dashboardLogic.js");
+
+const { reportData } = globalThis;
+const {
   calculateComponentTotals,
   calculatePhysicalGap,
   flattenSearchIndex,
   formatCurrency,
   getRiskLevel,
-} from "../src/dashboardLogic.js";
+} = globalThis.dashboardLogic;
 
 test("los componentes valorizados cuadran con el costo directo del informe", () => {
   const totals = calculateComponentTotals(reportData.components);

@@ -1,5 +1,5 @@
-import { reportData } from "./reportData.js";
-import {
+const { reportData } = globalThis;
+const {
   calculateComponentTotals,
   calculatePhysicalGap,
   calculateExecutionRatio,
@@ -7,7 +7,7 @@ import {
   formatPercent,
   getRiskLevel,
   matchesQuery,
-} from "./dashboardLogic.js";
+} = globalThis.dashboardLogic;
 
 const state = {
   query: "",
@@ -554,7 +554,11 @@ function render() {
 function wireEvents() {
   app.querySelector("#globalSearch").addEventListener("input", (event) => {
     state.query = event.target.value;
+    const cursorPosition = event.target.selectionStart ?? state.query.length;
     render();
+    const search = app.querySelector("#globalSearch");
+    search.focus();
+    search.setSelectionRange(cursorPosition, cursorPosition);
   });
 
   app.querySelectorAll("[data-panel-target]").forEach((button) => {
@@ -576,13 +580,27 @@ function wireEvents() {
     loadPdf.addEventListener("click", async () => {
       loadPdf.disabled = true;
       loadPdf.textContent = "Cargando PDF...";
-      const { informePdfBase64 } = await import("./pdfData.js");
+      const informePdfBase64 = await loadPdfData();
       const dataUrl = `data:application/pdf;base64,${informePdfBase64}`;
       app.querySelector("#pdfFrame").src = dataUrl;
       app.querySelector("#downloadPdf").href = dataUrl;
       loadPdf.textContent = "PDF cargado";
     });
   }
+}
+
+function loadPdfData() {
+  if (globalThis.informePdfBase64) {
+    return Promise.resolve(globalThis.informePdfBase64);
+  }
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "src/pdfData.js";
+    script.onload = () => resolve(globalThis.informePdfBase64);
+    script.onerror = () => reject(new Error("No se pudo cargar el PDF embebido."));
+    document.body.appendChild(script);
+  });
 }
 
 render();

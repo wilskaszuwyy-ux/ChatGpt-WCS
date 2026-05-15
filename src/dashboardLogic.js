@@ -1,8 +1,8 @@
-export function roundMoney(value) {
+function roundMoney(value) {
   return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 }
 
-export function calculateComponentTotals(components) {
+function calculateComponentTotals(components) {
   return components.reduce(
     (totals, component) => ({
       budget: roundMoney(totals.budget + component.budget),
@@ -14,7 +14,7 @@ export function calculateComponentTotals(components) {
   );
 }
 
-export function calculatePhysicalGap(programmedPercent, executedPercent) {
+function calculatePhysicalGap(programmedPercent, executedPercent) {
   const percent = roundMoney(Number(executedPercent) - Number(programmedPercent));
   return {
     percent,
@@ -22,46 +22,59 @@ export function calculatePhysicalGap(programmedPercent, executedPercent) {
   };
 }
 
-export function getRiskLevel(gapPercent) {
+function getRiskLevel(gapPercent) {
   if (gapPercent <= -10) return "danger";
   if (gapPercent < 0) return "warning";
   return "success";
 }
 
-export function formatCurrency(value) {
+function formatCurrency(value) {
   return new Intl.NumberFormat("es-PE", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value).replace(/^/, "S/ ");
 }
 
-export function formatPercent(value) {
+function formatPercent(value) {
   return `${new Intl.NumberFormat("es-PE", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value)}%`;
 }
 
-export function flattenSearchIndex(value) {
+function flattenSearchIndex(value) {
   if (value === null || value === undefined) return "";
   if (Array.isArray(value)) return value.map(flattenSearchIndex).join(" ");
   if (typeof value === "object") return Object.values(value).map(flattenSearchIndex).join(" ");
   return String(value);
 }
 
-export function normalizeText(value) {
+function normalizeText(value) {
   return String(value)
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 }
 
-export function matchesQuery(row, query) {
+function matchesQuery(row, query) {
   if (!query.trim()) return true;
   return normalizeText(flattenSearchIndex(row)).includes(normalizeText(query));
 }
 
-export function calculateExecutionRatio(executed, budget) {
+function calculateExecutionRatio(executed, budget) {
   if (!budget) return 0;
   return roundMoney((Number(executed) / Number(budget)) * 100);
 }
+
+globalThis.dashboardLogic = {
+  calculateComponentTotals,
+  calculateExecutionRatio,
+  calculatePhysicalGap,
+  flattenSearchIndex,
+  formatCurrency,
+  formatPercent,
+  getRiskLevel,
+  matchesQuery,
+  normalizeText,
+  roundMoney,
+};
