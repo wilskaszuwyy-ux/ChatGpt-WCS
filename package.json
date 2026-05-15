@@ -1,0 +1,18 @@
+{
+  "name": "dashboard-supervision-abril",
+  "version": "1.0.0",
+  "description": "Dashboard offline del informe mensual de supervision y valorizacion de obra por administracion directa.",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "test": "node --test",
+    "build": "node test/smoke.test.js"
+  },
+  "keywords": [
+    "dashboard",
+    "valorizacion",
+    "administracion-directa"
+  ],
+  "author": "",
+  "license": "UNLICENSED"
+}
