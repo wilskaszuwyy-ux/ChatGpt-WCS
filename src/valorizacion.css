@@ -1,0 +1,260 @@
+/* Estilos especificos para la herramienta de valorizacion automatica */
+
+/* Layout de la aplicacion */
+#vapp {
+  margin: 0 auto;
+  max-width: 1440px;
+  padding: 1.4rem;
+}
+
+/* Toolbar con acciones */
+.vtoolbar {
+  grid-template-columns: 1fr auto !important;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.vactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.vactions label.button {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Paneles */
+.vpanel {
+  display: none;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+.vpanel.active {
+  display: grid;
+}
+
+/* Formulario de campos */
+.vform {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.vform-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.vform-4 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.vfield {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.vfield span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.vfield input,
+.vfield select {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  color: var(--ink);
+  outline: none;
+  padding: 0.6rem 0.75rem;
+  width: 100%;
+  font: inherit;
+  font-size: 0.9rem;
+  transition: border-color 140ms ease;
+}
+
+.vfield input:focus,
+.vfield select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+/* Tabla con celdas editables */
+.vtable-card {
+  overflow: visible;
+}
+
+.vtable-card table {
+  min-width: 600px;
+}
+
+.vtable-card input,
+.vtable-card select {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.4rem;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.87rem;
+  outline: none;
+  padding: 0.3rem 0.4rem;
+  transition: border-color 120ms ease, background 120ms ease;
+  width: 100%;
+}
+
+.vtable-card input:focus,
+.vtable-card select:focus {
+  background: #f0fdf9;
+  border-color: var(--primary);
+}
+
+.vtable-card input.wide,
+.vtable-card select.wide {
+  min-width: 180px;
+}
+
+/* Celda calculada (solo lectura) */
+.vcalc {
+  background: #fafbfe;
+  color: var(--ink);
+  font-size: 0.87rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.vcalc-badge {
+  background: #dbeafe;
+  border-radius: 0.3rem;
+  color: #1e40af;
+  display: inline-block;
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.35rem;
+  text-transform: uppercase;
+  vertical-align: middle;
+  margin-left: 0.2rem;
+}
+
+/* Fila de total */
+.vtotal-row td {
+  background: var(--success-bg);
+  border-top: 2px solid var(--success);
+  color: var(--success);
+  font-weight: 700;
+}
+
+/* Valor total destacado */
+.vtotal {
+  color: var(--primary-strong);
+  font-size: 1.1rem;
+}
+
+/* Boton eliminar fila */
+.vbtn-del {
+  background: var(--danger-bg);
+  border: 1px solid #fca5a5;
+  border-radius: 999px;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.3rem 0.6rem;
+  transition: background 120ms;
+  white-space: nowrap;
+}
+
+.vbtn-del:hover {
+  background: #fee2e2;
+}
+
+/* Celdas vacias */
+.vempty {
+  color: var(--muted);
+  font-style: italic;
+  text-align: center;
+  padding: 1.5rem !important;
+}
+
+/* Alert neutral */
+.alert.neutral {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+/* KPIs de estado */
+.kpi.kwarning {
+  background: var(--warning-bg);
+  border-color: #fcd34d;
+}
+
+.kpi.kdanger {
+  background: var(--danger-bg);
+  border-color: #fca5a5;
+}
+
+/* Ancho de tabla minimo */
+#tblPresupuesto {
+  min-width: 800px;
+}
+
+/* Input de metrado en tabla de valorizacion */
+.vinput-metrado {
+  background: #fffbeb !important;
+  border: 1px solid #fcd34d !important;
+  border-radius: 0.4rem;
+  font-weight: 700 !important;
+  text-align: right;
+  width: 90px !important;
+}
+
+.vinput-metrado:focus {
+  background: #fef3c7 !important;
+  border-color: #d97706 !important;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12) !important;
+}
+
+/* Barra de progreso en tabla */
+.vtable-card .bar {
+  margin-bottom: 0.2rem;
+  margin-top: 0;
+}
+
+/* Rings en 3 columnas para el resumen */
+.vpanel .rings {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .vtoolbar {
+    grid-template-columns: 1fr !important;
+  }
+
+  .vform-2,
+  .vform-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .vpanel .rings {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  #vapp {
+    padding: 0.75rem;
+  }
+
+  .vactions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
